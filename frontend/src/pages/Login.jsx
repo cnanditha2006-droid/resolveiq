@@ -1,11 +1,15 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import AuthLayout from '../components/AuthLayout.jsx'
+import { homePathFor, useAuth } from '../context/auth.js'
 
 export default function Login() {
+  const { login } = useAuth()
+  const navigate = useNavigate()
   const [form, setForm] = useState({ email: '', password: '' })
   const [errors, setErrors] = useState({})
-  const [notice, setNotice] = useState('')
+  const [serverError, setServerError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -18,20 +22,27 @@ export default function Login() {
     return next
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     const next = validate()
     setErrors(next)
-    setNotice('')
-    if (Object.keys(next).length === 0) {
-      // Backend is not connected yet (Phase 4). Be honest in the UI.
-      setNotice('Form is valid. Login will work once the backend is connected.')
+    setServerError('')
+    if (Object.keys(next).length > 0) return
+
+    setSubmitting(true)
+    try {
+      const user = await login(form.email.trim(), form.password)
+      navigate(homePathFor(user.role), { replace: true })
+    } catch (err) {
+      setServerError(err.message)
+    } finally {
+      setSubmitting(false)
     }
   }
 
   return (
     <AuthLayout title="Welcome back" subtitle="Log in to manage your tickets.">
-      {notice && <div className="alert alert-info">{notice}</div>}
+      {serverError && <div className="alert alert-error">{serverError}</div>}
       <form onSubmit={handleSubmit} noValidate>
         <div className="field">
           <label htmlFor="email">Email</label>
@@ -45,7 +56,9 @@ export default function Login() {
             value={form.password} onChange={handleChange} />
           {errors.password && <div className="error-text">{errors.password}</div>}
         </div>
-        <button className="btn" type="submit">Log in</button>
+        <button className="btn" type="submit" disabled={submitting}>
+          {submitting ? 'Logging in...' : 'Log in'}
+        </button>
       </form>
       <p className="muted" style={{ marginTop: '1rem' }}>
         New here? <Link to="/register">Create an account</Link>

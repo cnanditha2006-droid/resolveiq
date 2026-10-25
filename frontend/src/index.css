@@ -66,3 +66,5 @@ p { margin: 0 0 1rem; }
 a { color: var(--primary); text-decoration: none; font-weight: 600; }
 a:hover { text-decoration: underline; }
 .muted { color: var(--muted); font-size: 0.9rem; }
+.alert-error { background: var(--danger-soft); color: var(--danger); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
