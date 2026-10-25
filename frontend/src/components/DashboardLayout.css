@@ -54,3 +54,4 @@
 .dash-logout { width: 100%; text-align: left; background: none; border: none; font: inherit; font-weight: 500; cursor: pointer; }
 .dash-user { display: flex; align-items: center; gap: 0.75rem; }
 .dash-username { font-weight: 600; }
+
