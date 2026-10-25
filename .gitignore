@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Environment files (secrets live here, never commit them)
+.env
+.env.*
+!.env.example
+
+# Build output
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor files
+.DS_Store
+.vscode/
+.idea/
