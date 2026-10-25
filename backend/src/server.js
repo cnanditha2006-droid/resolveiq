@@ -6,6 +6,7 @@ import mongoose from 'mongoose'
 import { connectDB } from './db.js'
 import authRoutes from './routes/auth.js'
 import ticketRoutes from './routes/tickets.js'
+import userRoutes from './routes/users.js'
 
 const app = express()
 
@@ -22,6 +23,7 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api/auth', authRoutes)
 app.use('/api/tickets', ticketRoutes)
+app.use('/api/users', userRoutes)
 
 const port = process.env.PORT || 5001
 
