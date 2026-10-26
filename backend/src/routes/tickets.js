@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import Ticket, { CATEGORIES, PRIORITIES, STATUSES } from '../models/Ticket.js'
 import { requireAuth, requireRole } from '../middleware/auth.js'
 import { ticketLimiter } from '../middleware/rateLimit.js'
+import { findDuplicate } from '../utils/duplicates.js'
 
 const router = Router()
 router.use(requireAuth)
@@ -43,6 +44,9 @@ router.post('/', requireRole('user'), ticketLimiter, async (req, res) => {
       return res.status(400).json({ message: 'Please fix the errors', errors })
     }
 
+    // A very similar recent ticket gets flagged for admin review. It is never blocked.
+    const duplicate = await findDuplicate(req.user._id, title.trim(), description.trim())
+
     // status and assignedTo are never read from the request
     const ticket = await Ticket.create({
       title: title.trim(),
@@ -51,9 +55,22 @@ router.post('/', requireRole('user'), ticketLimiter, async (req, res) => {
       priority: priority || 'Medium',
       createdBy: req.user._id,
       history: [{ action: 'Ticket created', by: req.user._id }],
+      flags: duplicate
+        ? [
+            {
+              kind: 'duplicate',
+              score: duplicate.score,
+              relatedTicket: duplicate.ticketId,
+              reason: 'Very similar to a recent ticket from the same user',
+            },
+          ]
+        : [],
     })
 
-    res.status(201).json({ ticket })
+    // The creator is never told about flags.
+    const result = ticket.toObject()
+    delete result.flags
+    res.status(201).json({ ticket: result })
   } catch (err) {
     console.error('Create ticket error:', err.message)
     res.status(500).json({ message: 'Something went wrong' })
