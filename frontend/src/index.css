@@ -124,3 +124,9 @@ a:hover { text-decoration: underline; }
 .history li:last-child { border-bottom: none; }
 .history .when { color: var(--muted); font-size: 0.8rem; }
 .history .history-note { margin: 0.25rem 0 0; overflow-wrap: anywhere; }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 0.25rem; border-bottom: 1px solid var(--border); margin-bottom: 1rem; }
+.tab { background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: 0.6rem 1rem; font: inherit; font-weight: 600; color: var(--muted); cursor: pointer; }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--primary-hover); border-bottom-color: var(--primary); }
+.nowrap { white-space: nowrap; }
