@@ -4,6 +4,8 @@ import Ticket, { CATEGORIES, PRIORITIES, STATUSES } from '../models/Ticket.js'
 import { requireAuth, requireRole } from '../middleware/auth.js'
 import { ticketLimiter } from '../middleware/rateLimit.js'
 import { findDuplicate } from '../utils/duplicates.js'
+import { findRapidSubmission } from '../utils/suspicious.js'
+import { recordAudit } from '../utils/audit.js'
 
 const router = Router()
 router.use(requireAuth)
@@ -44,8 +46,25 @@ router.post('/', requireRole('user'), ticketLimiter, async (req, res) => {
       return res.status(400).json({ message: 'Please fix the errors', errors })
     }
 
-    // A very similar recent ticket gets flagged for admin review. It is never blocked.
+    // Suspicious tickets are flagged for admin review. They are never blocked.
     const duplicate = await findDuplicate(req.user._id, title.trim(), description.trim())
+    const rapid = await findRapidSubmission(req.user._id)
+
+    const flags = []
+    if (duplicate) {
+      flags.push({
+        kind: 'duplicate',
+        score: duplicate.score,
+        relatedTicket: duplicate.ticketId,
+        reason: 'Very similar to a recent ticket from the same user',
+      })
+    }
+    if (rapid) {
+      flags.push({
+        kind: 'rapid_submission',
+        reason: `${rapid.count} tickets from the same user within ${rapid.minutes} minutes`,
+      })
+    }
 
     // status and assignedTo are never read from the request
     const ticket = await Ticket.create({
@@ -55,16 +74,15 @@ router.post('/', requireRole('user'), ticketLimiter, async (req, res) => {
       priority: priority || 'Medium',
       createdBy: req.user._id,
       history: [{ action: 'Ticket created', by: req.user._id }],
-      flags: duplicate
-        ? [
-            {
-              kind: 'duplicate',
-              score: duplicate.score,
-              relatedTicket: duplicate.ticketId,
-              reason: 'Very similar to a recent ticket from the same user',
-            },
-          ]
-        : [],
+      flags,
+    })
+
+    await recordAudit({
+      actor: req.user._id,
+      action: 'ticket_created',
+      targetType: 'ticket',
+      targetId: ticket._id,
+      details: `${ticket.ticketNumber}: ticket created`,
     })
 
     // The creator is never told about flags.
