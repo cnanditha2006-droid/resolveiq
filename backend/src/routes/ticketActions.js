@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import Ticket, { STATUSES } from '../models/Ticket.js'
 import User from '../models/User.js'
 import { requireAuth, requireRole } from '../middleware/auth.js'
+import { recordAudit } from '../utils/audit.js'
 
 const router = Router()
 router.use(requireAuth)
@@ -44,6 +45,14 @@ router.patch('/:id/assign', requireRole('admin'), async (req, res) => {
     ticket.history.push({ action: `Assigned to ${agent.name}`, by: req.user._id })
     await ticket.save()
     await ticket.populate('assignedTo', 'name email')
+
+    await recordAudit({
+      actor: req.user._id,
+      action: 'ticket_assigned',
+      targetType: 'ticket',
+      targetId: ticket._id,
+      details: `${ticket.ticketNumber}: assigned to ${agent.name}`,
+    })
 
     res.json({ ticket })
   } catch (err) {
@@ -93,6 +102,14 @@ router.patch('/:id/status', requireRole('admin', 'agent'), async (req, res) => {
       ...(cleanNote ? { note: cleanNote } : {}),
     })
     await ticket.save()
+
+    await recordAudit({
+      actor: req.user._id,
+      action: 'ticket_status_changed',
+      targetType: 'ticket',
+      targetId: ticket._id,
+      details: `${ticket.ticketNumber}: status changed from ${from} to ${status}`,
+    })
 
     res.json({ ticket })
   } catch (err) {

@@ -2,6 +2,7 @@ import { Router } from 'express'
 import mongoose from 'mongoose'
 import User from '../models/User.js'
 import { requireAuth, requireRole } from '../middleware/auth.js'
+import { recordAudit } from '../utils/audit.js'
 
 const router = Router()
 const ROLES = ['user', 'agent', 'admin']
@@ -42,8 +43,18 @@ router.patch('/:id/role', async (req, res) => {
     const user = await User.findById(req.params.id)
     if (!user) return res.status(404).json({ message: 'User not found' })
 
+    const oldRole = user.role
     user.role = role
     await user.save()
+
+    await recordAudit({
+      actor: req.user._id,
+      action: 'user_role_changed',
+      targetType: 'user',
+      targetId: user._id,
+      details: `${user.name}: role changed from ${oldRole} to ${role}`,
+    })
+
     res.json({ user: { id: user._id, name: user.name, email: user.email, role: user.role } })
   } catch (err) {
     console.error('Change role error:', err.message)
