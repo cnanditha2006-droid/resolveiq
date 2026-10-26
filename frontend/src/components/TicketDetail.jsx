@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { PriorityBadge, StatusBadge } from './Badges.jsx'
 import { apiRequest } from '../api.js'
 import { useAuth } from '../context/auth.js'
@@ -32,20 +32,25 @@ export default function TicketDetail({ ticketId, onClose, agents = [], onChanged
   const [newStatus, setNewStatus] = useState('')
   const [note, setNote] = useState('')
   const [busy, setBusy] = useState(false)
+  const [reloadKey, setReloadKey] = useState(0)
 
-  const load = useCallback(async () => {
-    try {
-      const res = await apiRequest(`/api/tickets/${ticketId}`, { token })
-      setTicket(res.ticket)
-      setError('')
-    } catch (err) {
-      setError(err.message)
-    }
-  }, [ticketId, token])
-
+  // Loads the ticket, and loads it again whenever reloadKey goes up.
   useEffect(() => {
-    load()
-  }, [load])
+    let cancelled = false
+    apiRequest(`/api/tickets/${ticketId}`, { token })
+      .then((res) => {
+        if (!cancelled) {
+          setTicket(res.ticket)
+          setError('')
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.message)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [ticketId, token, reloadKey])
 
   // Pressing Escape closes the window.
   useEffect(() => {
@@ -68,7 +73,7 @@ export default function TicketDetail({ ticketId, onClose, agents = [], onChanged
       setMessage({ type: 'success', text: `Status changed to ${status}.` })
       setNewStatus('')
       setNote('')
-      await load()
+      setReloadKey((k) => k + 1)
       if (onChanged) onChanged()
     } catch (err) {
       setMessage({ type: 'error', text: err.message })
@@ -103,7 +108,7 @@ export default function TicketDetail({ ticketId, onClose, agents = [], onChanged
         body: { agentId },
       })
       setMessage({ type: 'success', text: `Assigned to ${res.ticket.assignedTo.name}.` })
-      await load()
+      setReloadKey((k) => k + 1)
       if (onChanged) onChanged()
     } catch (err) {
       setMessage({ type: 'error', text: err.message })
