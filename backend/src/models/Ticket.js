@@ -15,6 +15,19 @@ const historySchema = new mongoose.Schema(
   { _id: false },
 )
 
+// A flag marks a ticket for an admin to look at. It never blocks the ticket.
+const flagSchema = new mongoose.Schema({
+  kind: { type: String, enum: ['duplicate', 'rapid_submission'], required: true },
+  reason: { type: String, maxlength: 300 },
+  score: { type: Number, min: 0, max: 1 },
+  relatedTicket: { type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' },
+  status: { type: String, enum: ['pending', 'dismissed'], default: 'pending' },
+  createdAt: { type: Date, default: Date.now },
+  reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  reviewedAt: { type: Date },
+  reviewNote: { type: String, maxlength: 500 },
+})
+
 const ticketSchema = new mongoose.Schema(
   {
     ticketNumber: { type: String, unique: true },
@@ -26,6 +39,9 @@ const ticketSchema = new mongoose.Schema(
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true },
     history: [historySchema],
+    // select: false keeps flags out of normal queries, so users never see them.
+    // Admin-only code asks for them explicitly.
+    flags: { type: [flagSchema], select: false, default: [] },
   },
   { timestamps: true },
 )
