@@ -2,6 +2,7 @@ import { Router } from 'express'
 import mongoose from 'mongoose'
 import Ticket, { CATEGORIES, PRIORITIES, STATUSES } from '../models/Ticket.js'
 import { requireAuth, requireRole } from '../middleware/auth.js'
+import { ticketLimiter } from '../middleware/rateLimit.js'
 
 const router = Router()
 router.use(requireAuth)
@@ -17,7 +18,7 @@ function scopeFor(user) {
   return { createdBy: user._id }
 }
 
-router.post('/', requireRole('user'), async (req, res) => {
+router.post('/', requireRole('user'), ticketLimiter, async (req, res) => {
   try {
     const { title, description, category, priority } = req.body || {}
     const errors = {}
