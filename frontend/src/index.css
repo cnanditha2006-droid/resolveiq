@@ -68,3 +68,59 @@ a:hover { text-decoration: underline; }
 .muted { color: var(--muted); font-size: 0.9rem; }
 .alert-error { background: var(--danger-soft); color: var(--danger); }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.badge { display: inline-block; padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
+.badge-open { background: #f1e8d8; color: #6f533a; }
+.badge-assigned { background: #e7edf6; color: #34507a; }
+.badge-in-progress { background: #fcefd2; color: #8a5a00; }
+.badge-resolved { background: #e2f0e5; color: #2e6b3f; }
+.badge-closed { background: #ececea; color: #55524c; }
+.badge-low { background: #ececea; color: #55524c; }
+.badge-medium { background: #e7edf6; color: #34507a; }
+.badge-high { background: #fcefd2; color: #8a5a00; }
+.badge-critical { background: #fde4e1; color: #b42318; }
+
+.field select, .field textarea { width: 100%; padding: 0.65rem 0.8rem; border: 1px solid var(--border); border-radius: 8px; font: inherit; background: #fff; }
+.field textarea { min-height: 110px; resize: vertical; }
+.field select:focus, .field textarea:focus { outline: 2px solid var(--primary); outline-offset: 1px; border-color: var(--primary); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+.btn-inline { width: auto; }
+.btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--primary-soft); }
+.alert-success { background: #e2f0e5; color: #2e6b3f; }
+
+.row-between { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; }
+.toolbar input, .toolbar select { padding: 0.55rem 0.7rem; border: 1px solid var(--border); border-radius: 8px; font: inherit; background: #fff; }
+.toolbar input { flex: 1; min-width: 200px; }
+
+.table-wrap { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.table th { text-align: left; padding: 0.6rem 0.75rem; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.table td { padding: 0.7rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+.table tr:last-child td { border-bottom: none; }
+.pager { display: flex; align-items: center; justify-content: space-between; margin-top: 1rem; }
+
+@media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+.table select { padding: 0.3rem 0.5rem; border: 1px solid var(--border); border-radius: 6px; font: inherit; background: #fff; max-width: 170px; }
+.btn-small { padding: 0.3rem 0.7rem; font-size: 0.82rem; }
+
+.link-button { background: none; border: none; padding: 0; font: inherit; font-weight: 600; color: var(--primary); cursor: pointer; text-align: left; overflow-wrap: anywhere; }
+.link-button:hover { text-decoration: underline; }
+.table td.title-cell { max-width: 320px; overflow-wrap: anywhere; }
+
+.modal-backdrop { position: fixed; inset: 0; background: rgba(46, 42, 37, 0.45); display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem; overflow-y: auto; z-index: 50; }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 720px; padding: 1.5rem; box-shadow: 0 10px 30px rgba(46, 42, 37, 0.25); }
+.modal-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 0.75rem; }
+.modal-header h2 { margin: 0; overflow-wrap: anywhere; }
+.detail-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.25rem; margin-bottom: 1rem; font-size: 0.9rem; color: var(--muted); }
+.ticket-description { white-space: pre-wrap; overflow-wrap: anywhere; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem; margin: 0 0 1rem; }
+.detail-section { border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1rem; }
+.detail-section h3 { margin-bottom: 0.75rem; }
+.history { list-style: none; padding: 0; margin: 0; }
+.history li { padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+.history li:last-child { border-bottom: none; }
+.history .when { color: var(--muted); font-size: 0.8rem; }
+.history .history-note { margin: 0.25rem 0 0; overflow-wrap: anywhere; }
