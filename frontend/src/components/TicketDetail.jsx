@@ -26,6 +26,7 @@ function formatDateTime(iso) {
 export default function TicketDetail({ ticketId, onClose, agents = [], onChanged }) {
   const { token, user } = useAuth()
   const isAdmin = user?.role === 'admin'
+  const isAgent = user?.role === 'agent'
   const [ticket, setTicket] = useState(null)
   const [error, setError] = useState('')
   const [message, setMessage] = useState(null)
@@ -118,6 +119,8 @@ export default function TicketDetail({ ticketId, onClose, agents = [], onChanged
   }
 
   const moves = ticket ? NEXT_STATUSES[ticket.status] || [] : []
+  // Admins and agents can work on a ticket until it is closed. Only admins assign or close.
+  const canManage = Boolean(ticket) && (isAdmin || isAgent) && ticket.status !== 'Closed'
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -161,11 +164,11 @@ export default function TicketDetail({ ticketId, onClose, agents = [], onChanged
               </div>
             )}
 
-            {isAdmin && ticket.status !== 'Closed' && (
+            {canManage && (
               <div className="detail-section">
-                <h3>Manage ticket</h3>
+                <h3>{isAdmin ? 'Manage ticket' : 'Update ticket'}</h3>
 
-                {ASSIGNABLE.includes(ticket.status) && (
+                {isAdmin && ASSIGNABLE.includes(ticket.status) && (
                   <div className="field">
                     <label htmlFor="assign-agent">Assign to</label>
                     <select
@@ -212,16 +215,18 @@ export default function TicketDetail({ ticketId, onClose, agents = [], onChanged
                   </form>
                 )}
 
-                <p style={{ marginTop: '1rem', marginBottom: 0 }}>
-                  <button
-                    type="button"
-                    className="btn btn-inline btn-secondary"
-                    disabled={busy}
-                    onClick={closeTicket}
-                  >
-                    Close ticket
-                  </button>
-                </p>
+                {isAdmin && (
+                  <p style={{ marginTop: '1rem', marginBottom: 0 }}>
+                    <button
+                      type="button"
+                      className="btn btn-inline btn-secondary"
+                      disabled={busy}
+                      onClick={closeTicket}
+                    >
+                      Close ticket
+                    </button>
+                  </p>
+                )}
               </div>
             )}
 
