@@ -8,6 +8,7 @@ import authRoutes from './routes/auth.js'
 import ticketRoutes from './routes/tickets.js'
 import ticketActionRoutes from './routes/ticketActions.js'
 import userRoutes from './routes/users.js'
+import statsRoutes from './routes/stats.js'
 import adminRoutes from './routes/admin.js'
 
 const app = express()
@@ -27,6 +28,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/tickets', ticketRoutes)
 app.use('/api/tickets', ticketActionRoutes)
 app.use('/api/users', userRoutes)
+app.use('/api/admin/stats', statsRoutes)
 app.use('/api/admin', adminRoutes)
 
 const port = process.env.PORT || 5001
