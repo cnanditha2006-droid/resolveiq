@@ -5,6 +5,7 @@ import TicketDetail from '../components/TicketDetail.jsx'
 import UsersPanel from '../components/UsersPanel.jsx'
 import ReviewQueue from '../components/ReviewQueue.jsx'
 import AuditLog from '../components/AuditLog.jsx'
+import StatsOverview from '../components/StatsOverview.jsx'
 import { apiRequest } from '../api.js'
 import { useAuth } from '../context/auth.js'
 
@@ -15,6 +16,7 @@ const NO_FILTERS = { q: '', status: '', priority: '', category: '' }
 // Tickets in these states can still be (re)assigned.
 const ASSIGNABLE = ['Open', 'Assigned', 'In Progress']
 const TABS = [
+  { id: 'overview', label: 'Overview' },
   { id: 'tickets', label: 'Tickets' },
   { id: 'review', label: 'Review queue' },
   { id: 'audit', label: 'Audit log' },
@@ -27,7 +29,7 @@ function formatDate(iso) {
 
 export default function AdminDashboard() {
   const { token } = useAuth()
-  const [tab, setTab] = useState('tickets')
+  const [tab, setTab] = useState('overview')
   const [filters, setFilters] = useState(NO_FILTERS)
   const [searchText, setSearchText] = useState('')
   const [page, setPage] = useState(1)
@@ -129,6 +131,8 @@ export default function AdminDashboard() {
           </button>
         ))}
       </div>
+
+      {tab === 'overview' && <StatsOverview onNavigate={setTab} />}
 
       {tab === 'tickets' && (
         <div className="card">
