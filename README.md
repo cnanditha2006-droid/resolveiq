@@ -190,3 +190,19 @@ resolveiq/
         ├── pages/        login, register, user / agent / admin dashboards
         └── api.js
 ```
+## Application Screenshots
+
+### Admin Dashboard
+![Admin Dashboard](screenshots/admin%20dashboard.png)
+
+### Admin Token Review
+![Admin Token Review](screenshots/admin%20token%20review.png)
+
+### Abuse Protection
+![Abuse Protection](screenshots/Fake%20tokens%20or%20Abuse%20protection%20feature.png)
+
+### Audit Log
+![Audit Log](screenshots/Audit%20log.png)
+
+### Token Description
+![Token Description](screenshots/Token%20description.png)
